@@ -119,7 +119,7 @@ Se utiliza **Laravel Sanctum** para autenticación basada en tokens.
 
 1. Clonar repositorio
 ```bash
-git clone <url-del-repositorio>
+git clone https://github.com/Sthephani-Platero/pymes-platform-backend.git
 cd backend
 Instalar dependencias
 
