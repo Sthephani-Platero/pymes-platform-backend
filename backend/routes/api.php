@@ -26,3 +26,12 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
 });
+
+
+// Ruta de ejemplo para el dashboard
+Route::middleware('auth:sanctum')->get('/dashboard', function (Request $request) {
+    return response()->json([
+        'message' => 'Bienvenida al dashboard 🔥',
+        'user' => $request->user()
+    ]);
+});
