@@ -2,39 +2,27 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Auth\RegisterCompanyController;
 
-// Ruta health
+// Health check
 Route::get('/health', function () {
     return response()->json(['status' => 'ok']);
 });
-// Ruta registro empresa + owner
+
+// Registro empresa
 Route::post('/register-company', [RegisterCompanyController::class, 'register']);
 
-// Ruta login
-Route::post('/login', function (Request $request) {
+// Login
+Route::post('/login', [AuthController::class, 'login']);
 
-    $credentials = $request->validate([
-        'email' => 'required|email',
-        'password' => 'required',
-    ]);
+// Rutas protegidas
+Route::middleware('auth:sanctum')->group(function () {
 
-    if (!Auth::attempt($credentials)) {
-        return response()->json([
-            'message' => 'Credenciales incorrectas'
-        ], 401);
-    }
+    Route::post('/logout', [AuthController::class, 'logout']);
 
-    $request->session()->regenerate();
+    Route::get('/user', function (Request $request) {
+        return $request->user();
+    });
 
-    return response()->json([
-        'message' => 'Login exitoso',
-        'user' => Auth::user()
-    ]);
 });
-
-// 🔐 Ruta protegida
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
