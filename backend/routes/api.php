@@ -3,11 +3,14 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Controllers\Auth\RegisterCompanyController;
 
 // Ruta health
 Route::get('/health', function () {
     return response()->json(['status' => 'ok']);
 });
+// Ruta registro empresa + owner
+Route::post('/register-company', [RegisterCompanyController::class, 'register']);
 
 // Ruta login
 Route::post('/login', function (Request $request) {
