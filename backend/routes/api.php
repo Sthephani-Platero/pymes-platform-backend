@@ -9,7 +9,12 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use App\Http\Controllers\PulsarController;
+use App\Http\Controllers\MarketController;
 
+
+Route::prefix('intelligence')->group(function () {
+    Route::get('/market', [MarketController::class, 'index']);
+});
 
 /*
 |--------------------------------------------------------------------------

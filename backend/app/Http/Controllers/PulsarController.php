@@ -15,95 +15,32 @@ class PulsarController extends Controller
         $this->apiKey = env('PULSAR_API_KEY');
     }
 
-    private function callPulsar($query, $variables = [])
-    {
-        $response = Http::withHeaders([
-            'Authorization' => 'Bearer ' . $this->apiKey,
-            'Content-Type' => 'application/json'
-        ])->post($this->endpoint, [
-            'query' => $query,
-            'variables' => $variables
-        ]);
-
-        return $response->json()['data'] ?? [];
-    }
-
-   public function getImpressions()
+    // 🔹 Método base reutilizable
+    public function call($query, $variables = [])
 {
-    $query = <<<'GRAPHQL'
-    query Impressions($filter: Filter!, $metric: ContentMetric) {
-        impressions(filter: $filter, metric: $metric)
+    $response = Http::withHeaders([
+        'Authorization' => 'Bearer ' . $this->apiKey,
+        'Content-Type' => 'application/json'
+    ])->post($this->endpoint, [
+        'query' => $query,
+        'variables' => $variables
+    ]);
+
+    $json = $response->json();
+
+    // 🔥 DEBUG REAL
+    if (isset($json['errors'])) {
+        dd('GRAPHQL ERROR', $json['errors']);
     }
-    GRAPHQL;
 
-    // Facebook
-    $facebook = $this->callPulsar($query, [
-        "filter" => [
-            "dateFrom" => "2026-01-01T00:00:00Z",
-            "dateTo" => "2026-02-01T23:59:59Z",
-            "brandId" => 8158,
-            "profiles" => [17853]
-        ],
-        "metric" => "SUM"
-    ]);
-
-    // Instagram
-    $instagram = $this->callPulsar($query, [
-        "filter" => [
-            "dateFrom" => "2026-01-01T00:00:00Z",
-            "dateTo" => "2026-02-01T23:59:59Z",
-            "brandId" => 8158,
-            "profiles" => [17854]
-        ],
-        "metric" => "SUM"
-    ]);
-
-    // X (Twitter)
-    $x = $this->callPulsar($query, [
-        "filter" => [
-            "dateFrom" => "2026-01-01T00:00:00Z",
-            "dateTo" => "2026-02-01T23:59:59Z",
-            "brandId" => 8158,
-            "profiles" => [17855]
-        ],
-        "metric" => "SUM"
-    ]);
-
-    return response()->json([
-        "facebook" => $facebook["impressions"] ?? 0,
-        "instagram" => $instagram["impressions"] ?? 0,
-        "x" => $x["impressions"] ?? 0
-    ]);
-}
-    public function getMentionsTrend()
-{
-    $query = <<<'GRAPHQL'
-    query Mentions($filter: Filter!, $metric: ContentMetric!) {
-        mentions(filter: $filter, metric: $metric)
-    }
-    GRAPHQL;
-
-    $variables = [
-        'filter' => [
-            'dateFrom' => '2025-01-01T00:00:00Z',
-            'dateTo' => '2025-01-31T23:59:59Z',
-            'brandId' => 8223,
-            'profiles' => [18031, 42773, 54568]
-        ],
-        'metric' => 'SUM'
-    ];
-
-    $data = $this->callPulsar($query, $variables);
-
-    dd($data); // 👈 aquí lo pones
-
-    return response()->json($data);
+    return $json['data'] ?? [];
 }
 
     // ==========================
-    // Obtener Brands + Profiles
+    // 🔹 QUERIES REUTILIZABLES
     // ==========================
-    public function getBrandsProfiles()
+
+    public function getBrands($page = 1, $limit = 10)
     {
         $query = <<<'GRAPHQL'
         query BrandsPlusProfiles($page: Int, $limit: Int) {
@@ -124,20 +61,13 @@ class PulsarController extends Controller
         }
         GRAPHQL;
 
-        $variables = [
-            "page" => 1,
-            "limit" => 10
-        ];
-
-        return response()->json(
-            $this->callPulsar($query, $variables)
-        );
+        return $this->call($query, [
+            "page" => $page,
+            "limit" => $limit
+        ]);
     }
 
-    // ==========================
-    // Engagements
-    // ==========================
-    public function getEngagements()
+    public function getEngagements($brandId, $profiles, $dateFrom, $dateTo, $metric = "SUM")
     {
         $query = <<<'GRAPHQL'
         query Engagements($filter: Filter!, $metric: ContentMetric) {
@@ -145,25 +75,18 @@ class PulsarController extends Controller
         }
         GRAPHQL;
 
-        $variables = [
-            'filter' => [
-                'dateFrom' => '2025-10-11T00:00:00Z',
-                'dateTo' => '2025-11-11T23:59:59Z',
-                'brandId' => 8223,
-                'profiles' => [18031, 42773, 54568]
+        return $this->call($query, [
+            "filter" => [
+                "dateFrom" => $dateFrom,
+                "dateTo" => $dateTo,
+                "brandId" => $brandId,
+                "profiles" => $profiles
             ],
-            'metric' => 'SUM'
-        ];
-
-        return response()->json(
-            $this->callPulsar($query, $variables)
-        );
+            "metric" => $metric
+        ]);
     }
 
-    // ==========================
-    // Comments
-    // ==========================
-    public function getComments()
+    public function getComments($brandId, $profiles, $dateFrom, $dateTo)
     {
         $query = <<<'GRAPHQL'
         query comments($filter: Filter!, $metric: ContentMetric!) {
@@ -171,18 +94,33 @@ class PulsarController extends Controller
         }
         GRAPHQL;
 
-        $variables = [
-            'filter' => [
-                'dateFrom' => '2025-01-01T00:00:00Z',
-                'dateTo' => '2025-01-26T23:59:59Z',
-                'brandId' => 8223,
-                'profiles' => [18031, 42773, 54568]
+        return $this->call($query, [
+            "filter" => [
+                "dateFrom" => $dateFrom,
+                "dateTo" => $dateTo,
+                "brandId" => $brandId,
+                "profiles" => $profiles
             ],
-            'metric' => 'SUM'
-        ];
+            "metric" => "SUM"
+        ]);
+    }
 
-        return response()->json(
-            $this->callPulsar($query, $variables)
-        );
+    public function getImpressions($brandId, $profiles, $dateFrom, $dateTo)
+    {
+        $query = <<<'GRAPHQL'
+        query Impressions($filter: Filter!, $metric: ContentMetric) {
+            impressions(filter: $filter, metric: $metric)
+        }
+        GRAPHQL;
+
+        return $this->call($query, [
+            "filter" => [
+                "dateFrom" => $dateFrom,
+                "dateTo" => $dateTo,
+                "brandId" => $brandId,
+                "profiles" => $profiles
+            ],
+            "metric" => "SUM"
+        ]);
     }
 }
