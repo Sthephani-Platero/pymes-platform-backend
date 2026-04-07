@@ -10,10 +10,12 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use App\Http\Controllers\PulsarController;
 use App\Http\Controllers\MarketController;
+use App\Http\Controllers\TrendsController;
 
 
 Route::prefix('intelligence')->group(function () {
     Route::get('/market', [MarketController::class, 'index']);
+    Route::get('/trends', [TrendsController::class, 'index']);
 });
 
 /*
@@ -122,123 +124,3 @@ Route::get('/pulsar/impressions', [PulsarController::class, 'getImpressions']);
 
 
 
-// ==========================
-// 🌐 Test Pulsar API
-// ==========================
-//
-//Route::get('/test-pulsar', function () {
-//
-//    $query = <<<'GRAPHQL'
-//    query BrandsPlusProfiles($page: Int, $limit: Int) {
-//      brands(page: $page, limit: $limit) {
-//        total
-//        nextPage
-//        brands {
-//          id
-//          name
-//          profiles {
-//            id
-//            source
-//            name
-//            plugged
-//          }
-//        }
-//      }
-//    }
-//    GRAPHQL;
-//
-//    // Definir las variables de la query
-//    $variables = [
-//        'page' => 2,
-//        'limit' => 10
-//    ];
-//
-//    $response = Http::withHeaders([
-//        'Authorization' => 'Bearer ' . env('PULSAR_API_KEY'),
-//        'Content-Type' => 'application/json'
-//    ])->post('https://data.pulsarplatform.com/graphql/core', [
-//        'query' => $query,
-//        'variables' => $variables
-//    ]);
-//
-//    return response()->json($response->json());
-//});
-//
-//
-//Route::get('/test-engagements', function () {
-//
-//    // Ejemplo de IDs (cámbialos por los reales que tengas)
-//    $brandID = 8223; // id de la marca
-//    $profID1 = 18031;
-//    $profID2 = 42773;
-//    $profID3 = 54568;
-//
-//    // Query GraphQL
-//    $query = <<<'GRAPHQL'
-//    query Engagements($filter: Filter!, $metric: ContentMetric) {
-//        engagements(filter: $filter, metric: $metric)
-//    }
-//    GRAPHQL;
-//
-//    // Variables
-//    $variables = [
-//        'filter' => [
-//            'dateFrom' => '2025-10-11T00:00:00Z',
-//            'dateTo'   => '2025-11-11T23:59:59Z',
-//            'brandId'  => $brandID,
-//            'profiles' => [$profID1, $profID2, $profID3],
-//        ],
-//        'metric' => 'SUM'
-//    ];
-//
-//    // Llamada a Pulsar
-//    $response = Http::withHeaders([
-//        'Authorization' => 'Bearer ' . env('PULSAR_API_KEY'),
-//        'Content-Type'  => 'application/json'
-//    ])->post('https://data.pulsarplatform.com/graphql/core', [
-//        'query'     => $query,
-//        'variables' => $variables
-//    ]);
-//
-//    return response()->json($response->json());
-//});
-//
-//Route::get('/test-comments', function (\Illuminate\Http\Request $request) {
-//
-//    // Ejemplo de IDs (reemplaza con los reales)
-//    $brandId     = $request->query('brandId', 8223);
-//    $profileID1  = $request->query('profile1', 18031);
-//    $profileID2  = $request->query('profile2', 42773);
-//    $profileID3  = $request->query('profile3', 54568);
-//
-//    $profiles = [$profileID1, $profileID2, $profileID3];
-//
-//    // Query GraphQL
-//    $query = <<<'GRAPHQL'
-//    query comments($filter: Filter!, $metric: ContentMetric!) {
-//        comments(filter: $filter, metric: $metric)
-//    }
-//    GRAPHQL;
-//
-//    // Variables que envía la API
-//    $variables = [
-//        'filter' => [
-//            'dateFrom' => $request->query('dateFrom', '2025-01-01T00:00:00Z'),
-//            'dateTo'   => $request->query('dateTo', '2025-01-26T23:59:59Z'),
-//            'brandId'  => $brandId,
-//            'profiles' => $profiles,
-//        ],
-//        'metric' => $request->query('metric', 'SUM')
-//    ];
-//
-//    // Llamada a Pulsar
-//    $response = Http::withHeaders([
-//        'Authorization' => 'Bearer ' . env('PULSAR_API_KEY'),
-//        'Content-Type'  => 'application/json'
-//    ])->post('https://data.pulsarplatform.com/graphql/core', [
-//        'query'     => $query,
-//        'variables' => $variables
-//    ]);
-//
-//    return response()->json($response->json());
-//});
