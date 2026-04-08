@@ -11,13 +11,16 @@ use Illuminate\Support\Str;
 use App\Http\Controllers\PulsarController;
 use App\Http\Controllers\MarketController;
 use App\Http\Controllers\TrendsController;
+use App\Http\Controllers\PredictionController;
+use App\Http\Controllers\InnovationController;
 
 
 Route::prefix('intelligence')->group(function () {
     Route::get('/market', [MarketController::class, 'index']);
     Route::get('/trends', [TrendsController::class, 'index']);
+    Route::get('/predictions', [PredictionController::class, 'index']);
+    Route::get('/innovation', [InnovationController::class, 'index']);
 });
-
 /*
 |--------------------------------------------------------------------------
 | API Routes

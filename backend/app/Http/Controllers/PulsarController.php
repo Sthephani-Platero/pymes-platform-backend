@@ -28,6 +28,10 @@ class PulsarController extends Controller
 
     $json = $response->json();
 
+    if (isset($response['errors'])) {
+    dd($response['errors']);
+}
+
     // 🔥 DEBUG REAL
     if (isset($json['errors'])) {
         dd('GRAPHQL ERROR', $json['errors']);
