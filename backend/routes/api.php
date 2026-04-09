@@ -13,6 +13,11 @@ use App\Http\Controllers\MarketController;
 use App\Http\Controllers\TrendsController;
 use App\Http\Controllers\PredictionController;
 use App\Http\Controllers\InnovationController;
+use App\Http\Controllers\DashboardController;
+
+
+
+Route::get('/dashboard', [DashboardController::class, 'index']);
 
 
 Route::prefix('intelligence')->group(function () {
@@ -20,6 +25,7 @@ Route::prefix('intelligence')->group(function () {
     Route::get('/trends', [TrendsController::class, 'index']);
     Route::get('/predictions', [PredictionController::class, 'index']);
     Route::get('/innovation', [InnovationController::class, 'index']);
+   
 });
 /*
 |--------------------------------------------------------------------------
@@ -60,12 +66,12 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     // Dashboard
-    Route::get('/dashboard', function (Request $request) {
-        return response()->json([
-            'message' => 'Bienvenida al dashboard 🔥',
-            'user' => $request->user()
-        ]);
-    });
+    //Route::get('/dashboard', function (Request $request) {
+    //    return response()->json([
+    //        'message' => 'Bienvenida al dashboard 🔥',
+    //        'user' => $request->user()
+    //    ]);
+    //});
 
     // Forgot Password
     Route::post('/forgot-password', function (Request $request) {
